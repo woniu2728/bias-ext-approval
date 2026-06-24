@@ -1,0 +1,1 @@
+{"id":"approval","name":"approval","version":"0.1.0","category":"feature","authors":["Bias"],"dependencies":["core"],"django":{"app_config":"bias_ext_approval.backend.apps.ApprovalExtensionConfig","app_label":"approval","migration_module":"bias_ext_approval.backend.django_migrations"},"backend":{"entry":"bias_ext_approval.backend.ext:extend"}}
