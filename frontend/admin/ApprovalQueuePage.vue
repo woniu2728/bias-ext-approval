@@ -115,7 +115,7 @@ import {
   resolveApprovalSelectionState,
   resolveApprovalTemplateOptions,
   useModalStore,
-} from '@bias/admin/components'
+} from '@bias/core/components/admin'
 
 const PAGE_KEY = 'approval.queue'
 const loading = ref(true)

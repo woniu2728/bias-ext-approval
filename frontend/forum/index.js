@@ -1,4 +1,4 @@
-import { extendForum } from '@bias/forum'
+import { extendForum } from '@bias/core/forum'
 import DiscussionApprovedPostItem from './components/DiscussionApprovedPostItem.vue'
 import DiscussionRejectedPostItem from './components/DiscussionRejectedPostItem.vue'
 import DiscussionResubmittedPostItem from './components/DiscussionResubmittedPostItem.vue'

@@ -1,4 +1,4 @@
-import { getUiCopy } from '@bias/forum'
+import { getUiCopy } from '@bias/core/forum'
 
 export function registerApprovalComposerCopy(forum) {
   for (const item of [

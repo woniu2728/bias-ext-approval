@@ -3,7 +3,7 @@ import {
 import {
   getUiCopy,
   ModerationActionModal
-} from '@bias/forum'
+} from '@bias/core/forum'
 
 export function registerApprovalModerationActions(forum) {
   registerApprovalModerationCopy(forum)
