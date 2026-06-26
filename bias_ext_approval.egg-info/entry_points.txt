@@ -1,2 +1,0 @@
-[bias.extensions]
-approval = bias_ext_approval.backend.ext:extend
