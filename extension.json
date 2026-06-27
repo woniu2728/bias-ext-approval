@@ -20,5 +20,8 @@
   "extra": {
     "auto_install": true,
     "auto_enable": true
+  },
+  "security": {
+    "capabilities_notice": "Moderation workflow extension; can change discussion and post approval states and expose approval queues to staff users."
   }
 }
