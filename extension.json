@@ -9,10 +9,10 @@
   "dependencies": [
     "core",
     "users",
-    "discussions",
-    "posts"
+    "content"
   ],
   "optional_dependencies": [
+    "discussions",
     "notifications"
   ],
   "django": {

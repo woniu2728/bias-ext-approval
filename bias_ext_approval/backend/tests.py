@@ -7,12 +7,13 @@ from django.core.management import call_command
 from django.test import TestCase
 from ninja_jwt.tokens import RefreshToken
 
-from bias_core.forum_registry import (
+from bias_core.extensions.testing import (
+    ExtensionRuntimeTestMixin,
+    build_extension_test_host,
+    clear_runtime_setting_caches,
     get_registry_permission_codes_by_prefix,
     get_registry_staff_managed_admin_permission_codes,
 )
-from bias_core.settings_service import clear_runtime_setting_caches
-from bias_core.testing import ExtensionRuntimeTestMixin
 from bias_core.extensions.runtime import (
     approve_runtime_discussion,
     create_runtime_discussion,
@@ -60,8 +61,9 @@ def notification_model():
     return get_runtime_notification_model()
 
 
-class ApprovalPermissionRegistryTests(TestCase):
+class ApprovalPermissionRegistryTests(ExtensionRuntimeTestMixin, TestCase):
     def test_approval_admin_permissions_are_registered_by_extension(self):
+        self.bootstrap_extensions("approval")
         permissions = {
             "admin.approval.view",
             "admin.approval.approve",
@@ -80,6 +82,109 @@ class ApprovalExtensionDiagnosticsTests(ExtensionRuntimeTestMixin, TestCase):
         self.assertIn("approval.service", application.get_service_provider_keys(extension_id="approval"))
         for key in ("serialize_item", "list_queue", "process_item", "bulk_process"):
             self.assertTrue(callable(service[key]), key)
+
+    def test_notification_integration_is_optional(self):
+        application = build_extension_test_host("approval")
+        listener_names = {
+            listener.handler.__name__
+            for listener in application.events.get_listeners(extension_id="approval")
+        }
+        notification_type_codes = {
+            item.code
+            for item in application.forum_registry.get_notification_types()
+            if item.module_id == "approval"
+        }
+
+        self.assertIsNone(application.get_service("notifications.service"))
+        self.assertIn("handle_discussion_approved", listener_names)
+        self.assertIn("handle_post_approved", listener_names)
+        self.assertNotIn("discussionApproved", notification_type_codes)
+        self.assertNotIn("postRejected", notification_type_codes)
+
+    def test_notification_integration_registers_when_notifications_enabled(self):
+        application = build_extension_test_host("notifications", "approval")
+        notification_type_codes = {
+            item.code
+            for item in application.forum_registry.get_notification_types()
+            if item.module_id == "approval"
+        }
+
+        self.assertIsNotNone(application.get_service("notifications.service"))
+        self.assertIn("discussionApproved", notification_type_codes)
+        self.assertIn("discussionRejected", notification_type_codes)
+        self.assertIn("postApproved", notification_type_codes)
+        self.assertIn("postRejected", notification_type_codes)
+
+    def test_post_approval_listener_uses_event_context(self):
+        from bias_ext_approval.backend.listeners import handle_post_approved
+
+        admin = User.objects.create_user(
+            username="approval-listener-admin",
+            email="approval-listener-admin@example.com",
+            password="password123",
+            is_email_confirmed=True,
+        )
+        event = SimpleNamespace(
+            post_id=44,
+            discussion_id=55,
+            actor_user_id=66,
+            admin_user_id=admin.id,
+            note="approved from event",
+            previous_status="pending",
+            post_number=7,
+            discussion_title="Approval event discussion",
+        )
+
+        with patch(
+            "bias_ext_approval.backend.listeners.get_runtime_post_model",
+            create=True,
+            side_effect=AssertionError("approval listener should use post event context"),
+        ), patch(
+            "bias_ext_approval.backend.listeners.notify_runtime_notification",
+        ) as notify_mock, patch(
+            "bias_ext_approval.backend.listeners.create_runtime_timeline_from_builder",
+        ) as timeline_mock:
+            handle_post_approved(event)
+
+        notify_mock.assert_called_once()
+        self.assertEqual(notify_mock.call_args.args[0], "notify_post_approved_from_event")
+        self.assertIs(notify_mock.call_args.kwargs["event"], event)
+        timeline_mock.assert_called_once()
+        self.assertEqual(timeline_mock.call_args.kwargs["extra"]["post_number"], 7)
+
+    def test_discussion_approval_listener_uses_event_context(self):
+        from bias_ext_approval.backend.listeners import handle_discussion_approved
+
+        admin = User.objects.create_user(
+            username="discussion-listener-admin",
+            email="discussion-listener-admin@example.com",
+            password="password123",
+            is_email_confirmed=True,
+        )
+        event = SimpleNamespace(
+            discussion_id=55,
+            actor_user_id=66,
+            admin_user_id=admin.id,
+            note="approved from event",
+            discussion_title="Approval event discussion",
+        )
+
+        with patch(
+            "bias_ext_approval.backend.listeners.get_runtime_discussion_model",
+            create=True,
+            side_effect=AssertionError("approval listener should use discussion event context"),
+        ), patch(
+            "bias_ext_approval.backend.listeners.notify_runtime_notification",
+        ) as notify_mock, patch(
+            "bias_ext_approval.backend.listeners.create_runtime_timeline_from_builder",
+        ) as timeline_mock:
+            handle_discussion_approved(event)
+
+        notify_mock.assert_called_once()
+        self.assertEqual(notify_mock.call_args.args[0], "notify_discussion_approved_from_event")
+        self.assertIs(notify_mock.call_args.kwargs["event"], event)
+        timeline_mock.assert_called_once()
+        self.assertEqual(timeline_mock.call_args.kwargs["extra"]["post_type"], "discussionApproved")
 
     def test_inspect_reports_no_approval_django_migration_plan(self):
         stdout = StringIO()

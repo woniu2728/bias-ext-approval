@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from django.db.models import Subquery
-
 from bias_core.extensions.runtime import (
-    get_runtime_discussion_model,
-    get_runtime_post_model,
+    count_runtime_discussion_pending_approvals,
+    count_runtime_post_pending_approvals,
 )
 from bias_core.extensions import ResourceFieldDefinition
 
@@ -32,13 +30,7 @@ def admin_stats_resource_field_definitions():
 
 
 def resolve_admin_pending_approvals(stats, context: dict) -> int:
-    discussion_model = get_runtime_discussion_model()
-    post_model = get_runtime_post_model()
-    pending_discussions = discussion_model.objects.filter(approval_status=discussion_model.APPROVAL_PENDING)
-    pending_posts = post_model.objects.filter(approval_status=post_model.APPROVAL_PENDING).exclude(
-        id__in=Subquery(pending_discussions.values("first_post_id"))
-    )
-    return pending_discussions.count() + pending_posts.count()
+    return count_runtime_discussion_pending_approvals() + count_runtime_post_pending_approvals()
 
 
 def resolve_approval_event_data(post, context: dict) -> dict | None:

@@ -2,8 +2,10 @@
 name = "bias-ext-approval"
 version = "0.1.0"
 dependencies = ["bias-core>=0.1,<0.2"]
+
 [project.entry-points."bias.extensions"]
 approval = "bias_ext_approval.backend.ext:extend"
+
 [tool.setuptools]
 include-package-data = true
 
@@ -13,7 +15,22 @@ include = ["bias_ext_approval*"]
 
 [tool.setuptools.data-files]
 "bias_extensions/approval" = ["extension.json"]
-"bias_extensions/approval/frontend/admin" = ["frontend/admin/ApprovalQueuePage.vue", "frontend/admin/approvalQueuePageBootstrap.js", "frontend/admin/index.js"]
-"bias_extensions/approval/frontend/forum" = ["frontend/forum/approvalComposer.js", "frontend/forum/approvalModerationActions.js", "frontend/forum/index.js", "frontend/forum/sdk.js"]
-"bias_extensions/approval/frontend/forum/components" = ["frontend/forum/components/DiscussionApprovedPostItem.vue", "frontend/forum/components/DiscussionRejectedPostItem.vue", "frontend/forum/components/DiscussionResubmittedPostItem.vue", "frontend/forum/components/PostApprovedPostItem.vue", "frontend/forum/components/PostRejectedPostItem.vue", "frontend/forum/components/PostResubmittedPostItem.vue"]
-
+"bias_extensions/approval/frontend/admin" = [
+  "frontend/admin/ApprovalQueuePage.vue",
+  "frontend/admin/approvalQueuePageBootstrap.js",
+  "frontend/admin/index.js",
+]
+"bias_extensions/approval/frontend/forum" = [
+  "frontend/forum/approvalComposer.js",
+  "frontend/forum/approvalModerationActions.js",
+  "frontend/forum/index.js",
+  "frontend/forum/sdk.js",
+]
+"bias_extensions/approval/frontend/forum/components" = [
+  "frontend/forum/components/DiscussionApprovedPostItem.vue",
+  "frontend/forum/components/DiscussionRejectedPostItem.vue",
+  "frontend/forum/components/DiscussionResubmittedPostItem.vue",
+  "frontend/forum/components/PostApprovedPostItem.vue",
+  "frontend/forum/components/PostRejectedPostItem.vue",
+  "frontend/forum/components/PostResubmittedPostItem.vue",
+]
