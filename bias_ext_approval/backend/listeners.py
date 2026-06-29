@@ -1,8 +1,19 @@
-from bias_core.extensions.runtime import (
-    create_runtime_timeline_from_builder,
-    get_runtime_user_by_id,
-    notify_runtime_notification,
-)
+def create_runtime_timeline_from_builder(*args, **kwargs):
+    from bias_core.extensions.runtime import create_runtime_timeline_from_builder as runtime_create_timeline_from_builder
+
+    return runtime_create_timeline_from_builder(*args, **kwargs)
+
+
+def get_runtime_user_by_id(*args, **kwargs):
+    from bias_core.extensions.runtime import get_runtime_user_by_id as runtime_get_user_by_id
+
+    return runtime_get_user_by_id(*args, **kwargs)
+
+
+def notify_runtime_notification(*args, **kwargs):
+    from bias_core.extensions.runtime import notify_runtime_notification as runtime_notify_notification
+
+    return runtime_notify_notification(*args, **kwargs)
 
 
 def handle_discussion_approved(event) -> None:

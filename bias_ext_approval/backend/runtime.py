@@ -3,13 +3,6 @@ from __future__ import annotations
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from bias_core.extensions.runtime import (
-    list_runtime_discussion_approval_queue_items,
-    list_runtime_post_approval_queue_items,
-    process_runtime_discussion_approval_item,
-    process_runtime_post_approval_item,
-)
-
 
 def approval_service_provider() -> dict:
     return {
@@ -18,6 +11,34 @@ def approval_service_provider() -> dict:
         "process_item": process_approval_item,
         "bulk_process": bulk_process_approval_items,
     }
+
+
+def list_runtime_discussion_approval_queue_items(*args, **kwargs):
+    from bias_core.extensions.runtime import (
+        list_runtime_discussion_approval_queue_items as runtime_list_discussion_approval_queue_items,
+    )
+
+    return runtime_list_discussion_approval_queue_items(*args, **kwargs)
+
+
+def list_runtime_post_approval_queue_items(*args, **kwargs):
+    from bias_core.extensions.runtime import list_runtime_post_approval_queue_items as runtime_list_post_approval_queue_items
+
+    return runtime_list_post_approval_queue_items(*args, **kwargs)
+
+
+def process_runtime_discussion_approval_item(*args, **kwargs):
+    from bias_core.extensions.runtime import (
+        process_runtime_discussion_approval_item as runtime_process_discussion_approval_item,
+    )
+
+    return runtime_process_discussion_approval_item(*args, **kwargs)
+
+
+def process_runtime_post_approval_item(*args, **kwargs):
+    from bias_core.extensions.runtime import process_runtime_post_approval_item as runtime_process_post_approval_item
+
+    return runtime_process_post_approval_item(*args, **kwargs)
 
 
 def serialize_approval_item(content_type: str, item) -> dict:

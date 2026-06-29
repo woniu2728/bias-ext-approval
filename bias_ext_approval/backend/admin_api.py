@@ -7,14 +7,27 @@ from bias_core.extensions.platform import api_error
 from bias_core.extensions.platform import AccessTokenAuth
 from bias_core.extensions.platform import PaginationService
 from bias_core.extensions.platform import log_admin_action
-from bias_core.extensions.runtime import (
-    bulk_process_runtime_approval_items,
-    list_runtime_approval_queue_items,
-    process_runtime_approval_item,
-)
 
 
 router = Router()
+
+
+def bulk_process_runtime_approval_items(*args, **kwargs):
+    from bias_core.extensions.runtime import bulk_process_runtime_approval_items as runtime_bulk_process_approval_items
+
+    return runtime_bulk_process_approval_items(*args, **kwargs)
+
+
+def list_runtime_approval_queue_items(*args, **kwargs):
+    from bias_core.extensions.runtime import list_runtime_approval_queue_items as runtime_list_approval_queue_items
+
+    return runtime_list_approval_queue_items(*args, **kwargs)
+
+
+def process_runtime_approval_item(*args, **kwargs):
+    from bias_core.extensions.runtime import process_runtime_approval_item as runtime_process_approval_item
+
+    return runtime_process_approval_item(*args, **kwargs)
 
 
 def _require_admin_permission(request, permission_code: str, message: str):

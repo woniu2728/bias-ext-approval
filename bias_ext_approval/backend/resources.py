@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from bias_core.extensions.runtime import (
-    count_runtime_discussion_pending_approvals,
-    count_runtime_post_pending_approvals,
-)
 from bias_core.extensions import ResourceFieldDefinition
 
 
@@ -15,6 +11,20 @@ APPROVAL_POST_EVENT_TYPES = (
     "postRejected",
     "postResubmitted",
 )
+
+
+def count_runtime_discussion_pending_approvals(*args, **kwargs):
+    from bias_core.extensions.runtime import (
+        count_runtime_discussion_pending_approvals as runtime_count_discussion_pending_approvals,
+    )
+
+    return runtime_count_discussion_pending_approvals(*args, **kwargs)
+
+
+def count_runtime_post_pending_approvals(*args, **kwargs):
+    from bias_core.extensions.runtime import count_runtime_post_pending_approvals as runtime_count_post_pending_approvals
+
+    return runtime_count_post_pending_approvals(*args, **kwargs)
 
 
 def admin_stats_resource_field_definitions():

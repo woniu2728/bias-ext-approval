@@ -14,26 +14,65 @@ from bias_core.extensions.testing import (
     get_registry_permission_codes_by_prefix,
     get_registry_staff_managed_admin_permission_codes,
 )
-from bias_core.extensions.runtime import (
-    approve_runtime_discussion,
-    create_runtime_discussion,
-    get_runtime_discussion_model,
-    list_runtime_discussions,
-    reject_runtime_discussion,
-)
 from bias_ext_approval.backend.resources import resolve_approval_event_data
-from bias_core.extensions.runtime import get_runtime_notification_model
-from bias_core.extensions.runtime import (
-    approve_runtime_post,
-    create_runtime_post,
-    get_runtime_post_model,
-    reject_runtime_post,
-)
-from bias_core.extensions.runtime import (
-    get_runtime_group_model,
-    get_runtime_permission_model,
-    get_runtime_user_model,
-)
+
+
+def _runtime_facade(name: str):
+    from importlib import import_module
+
+    return getattr(import_module("bias_core.extensions.runtime"), name)
+
+
+def approve_runtime_discussion(*args, **kwargs):
+    return _runtime_facade("approve_runtime_discussion")(*args, **kwargs)
+
+
+def create_runtime_discussion(*args, **kwargs):
+    return _runtime_facade("create_runtime_discussion")(*args, **kwargs)
+
+
+def get_runtime_discussion_model(*args, **kwargs):
+    return _runtime_facade("get_runtime_discussion_model")(*args, **kwargs)
+
+
+def list_runtime_discussions(*args, **kwargs):
+    return _runtime_facade("list_runtime_discussions")(*args, **kwargs)
+
+
+def reject_runtime_discussion(*args, **kwargs):
+    return _runtime_facade("reject_runtime_discussion")(*args, **kwargs)
+
+
+def get_runtime_notification_model(*args, **kwargs):
+    return _runtime_facade("get_runtime_notification_model")(*args, **kwargs)
+
+
+def approve_runtime_post(*args, **kwargs):
+    return _runtime_facade("approve_runtime_post")(*args, **kwargs)
+
+
+def create_runtime_post(*args, **kwargs):
+    return _runtime_facade("create_runtime_post")(*args, **kwargs)
+
+
+def get_runtime_post_model(*args, **kwargs):
+    return _runtime_facade("get_runtime_post_model")(*args, **kwargs)
+
+
+def reject_runtime_post(*args, **kwargs):
+    return _runtime_facade("reject_runtime_post")(*args, **kwargs)
+
+
+def get_runtime_group_model(*args, **kwargs):
+    return _runtime_facade("get_runtime_group_model")(*args, **kwargs)
+
+
+def get_runtime_permission_model(*args, **kwargs):
+    return _runtime_facade("get_runtime_permission_model")(*args, **kwargs)
+
+
+def get_runtime_user_model(*args, **kwargs):
+    return _runtime_facade("get_runtime_user_model")(*args, **kwargs)
 
 
 class RuntimeModelProxy:
