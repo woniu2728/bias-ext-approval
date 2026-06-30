@@ -34,3 +34,6 @@ include = ["bias_ext_approval*"]
   "frontend/forum/components/PostRejectedPostItem.vue",
   "frontend/forum/components/PostResubmittedPostItem.vue",
 ]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "bias_core.extension_test_settings"
