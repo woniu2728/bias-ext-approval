@@ -9,6 +9,7 @@ from bias_core.extensions import (
     ForumCapabilitiesExtender,
     LifecycleExtender,
     PostEventExtender,
+    RuntimeServiceContractExtender,
     ServiceProviderExtender,
 )
 
@@ -91,6 +92,15 @@ def service_extenders():
         ServiceProviderExtender(
             key="approval.service",
             provider=approval_service_provider,
+        ),
+        RuntimeServiceContractExtender().service(
+            "approval.service",
+            required_methods=(
+                "bulk_process",
+                "list_queue",
+                "process_item",
+                "serialize_item",
+            ),
         ),
         LifecycleExtender(),
     )
