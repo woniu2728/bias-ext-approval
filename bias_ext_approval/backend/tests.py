@@ -9,6 +9,7 @@ from ninja_jwt.tokens import RefreshToken
 
 from bias_core.extensions.testing import (
     ExtensionRuntimeTestMixin,
+    assert_runtime_service_contracts,
     build_extension_test_host,
     clear_runtime_setting_caches,
     get_registry_permission_codes_by_prefix,
@@ -118,6 +119,7 @@ class ApprovalExtensionDiagnosticsTests(ExtensionRuntimeTestMixin, TestCase):
         application = self.bootstrap_extensions("approval")
         service = application.get_service("approval.service")
 
+        assert_runtime_service_contracts(application, "approval", "approval.service")
         self.assertIn("approval.service", application.get_service_provider_keys(extension_id="approval"))
         for key in ("serialize_item", "list_queue", "process_item", "bulk_process"):
             self.assertTrue(callable(service[key]), key)
