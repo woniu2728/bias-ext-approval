@@ -13,32 +13,36 @@ def approval_service_provider() -> dict:
     }
 
 
-def list_runtime_discussion_approval_queue_items(*args, **kwargs):
-    from bias_core.extensions.runtime import (
-        list_runtime_discussion_approval_queue_items as runtime_list_discussion_approval_queue_items,
-    )
+def get_runtime_service(service_key: str, default=None):
+    from bias_core.extensions.runtime import get_runtime_service as runtime_get_service
 
-    return runtime_list_discussion_approval_queue_items(*args, **kwargs)
+    return runtime_get_service(service_key, default)
 
 
-def list_runtime_post_approval_queue_items(*args, **kwargs):
-    from bias_core.extensions.runtime import list_runtime_post_approval_queue_items as runtime_list_post_approval_queue_items
-
-    return runtime_list_post_approval_queue_items(*args, **kwargs)
-
-
-def process_runtime_discussion_approval_item(*args, **kwargs):
-    from bias_core.extensions.runtime import (
-        process_runtime_discussion_approval_item as runtime_process_discussion_approval_item,
-    )
-
-    return runtime_process_discussion_approval_item(*args, **kwargs)
+def _service_method(service, name: str):
+    if isinstance(service, dict):
+        method = service.get(name)
+    else:
+        method = getattr(service, name, None)
+    if not callable(method):
+        raise RuntimeError(f"Approval 扩展运行时服务缺少方法: {name}")
+    return method
 
 
-def process_runtime_post_approval_item(*args, **kwargs):
-    from bias_core.extensions.runtime import process_runtime_post_approval_item as runtime_process_post_approval_item
+def list_discussion_approval_queue_items(*args, **kwargs):
+    return _service_method(get_runtime_service("content.discussions"), "list_approval_queue")(*args, **kwargs)
 
-    return runtime_process_post_approval_item(*args, **kwargs)
+
+def list_post_approval_queue_items(*args, **kwargs):
+    return _service_method(get_runtime_service("content.posts"), "list_approval_queue")(*args, **kwargs)
+
+
+def process_discussion_approval_item(*args, **kwargs):
+    return _service_method(get_runtime_service("content.discussions"), "process_approval")(*args, **kwargs)
+
+
+def process_post_approval_item(*args, **kwargs):
+    return _service_method(get_runtime_service("content.posts"), "process_approval")(*args, **kwargs)
 
 
 def serialize_approval_item(content_type: str, item) -> dict:
@@ -51,10 +55,10 @@ def list_approval_queue_items(*, content_type: str = "all") -> list[dict]:
     items = []
 
     if content_type in {"all", "discussion"}:
-        items.extend(list_runtime_discussion_approval_queue_items())
+        items.extend(list_discussion_approval_queue_items())
 
     if content_type in {"all", "post"}:
-        items.extend(list_runtime_post_approval_queue_items())
+        items.extend(list_post_approval_queue_items())
 
     items.sort(key=lambda item: item["created_at"], reverse=True)
     return items
@@ -102,7 +106,7 @@ def bulk_process_approval_items(*, action: str, items, actor, note: str = "") ->
 def _process_discussion_approval(content_id: int, action: str, actor, note: str) -> dict:
     if action not in {"approve", "reject"}:
         raise ValidationError("无效的审核动作")
-    return process_runtime_discussion_approval_item(
+    return process_discussion_approval_item(
         content_id=content_id,
         action=action,
         actor=actor,
@@ -113,7 +117,7 @@ def _process_discussion_approval(content_id: int, action: str, actor, note: str)
 def _process_post_approval(content_id: int, action: str, actor, note: str) -> dict:
     if action not in {"approve", "reject"}:
         raise ValidationError("无效的审核动作")
-    return process_runtime_post_approval_item(
+    return process_post_approval_item(
         content_id=content_id,
         action=action,
         actor=actor,

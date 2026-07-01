@@ -181,9 +181,9 @@ class ApprovalExtensionDiagnosticsTests(ExtensionRuntimeTestMixin, TestCase):
             create=True,
             side_effect=AssertionError("approval listener should use post event context"),
         ), patch(
-            "bias_ext_approval.backend.listeners.notify_runtime_notification",
+            "bias_ext_approval.backend.listeners._call_notification",
         ) as notify_mock, patch(
-            "bias_ext_approval.backend.listeners.create_runtime_timeline_from_builder",
+            "bias_ext_approval.backend.listeners._create_timeline_from_builder",
         ) as timeline_mock:
             handle_post_approved(event)
 
@@ -215,9 +215,9 @@ class ApprovalExtensionDiagnosticsTests(ExtensionRuntimeTestMixin, TestCase):
             create=True,
             side_effect=AssertionError("approval listener should use discussion event context"),
         ), patch(
-            "bias_ext_approval.backend.listeners.notify_runtime_notification",
+            "bias_ext_approval.backend.listeners._call_notification",
         ) as notify_mock, patch(
-            "bias_ext_approval.backend.listeners.create_runtime_timeline_from_builder",
+            "bias_ext_approval.backend.listeners._create_timeline_from_builder",
         ) as timeline_mock:
             handle_discussion_approved(event)
 

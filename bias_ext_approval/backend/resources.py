@@ -13,18 +13,27 @@ APPROVAL_POST_EVENT_TYPES = (
 )
 
 
-def count_runtime_discussion_pending_approvals(*args, **kwargs):
-    from bias_core.extensions.runtime import (
-        count_runtime_discussion_pending_approvals as runtime_count_discussion_pending_approvals,
-    )
-
-    return runtime_count_discussion_pending_approvals(*args, **kwargs)
+def count_discussion_pending_approvals(*args, **kwargs):
+    return _service_method(get_runtime_service("content.discussions"), "count_pending_approvals")(*args, **kwargs)
 
 
-def count_runtime_post_pending_approvals(*args, **kwargs):
-    from bias_core.extensions.runtime import count_runtime_post_pending_approvals as runtime_count_post_pending_approvals
+def get_runtime_service(service_key: str, default=None):
+    from bias_core.extensions.runtime import get_runtime_service as runtime_get_service
 
-    return runtime_count_post_pending_approvals(*args, **kwargs)
+    return runtime_get_service(service_key, default)
+
+
+def _service_method(service, name: str):
+    if isinstance(service, dict):
+        method = service.get(name)
+    else:
+        method = getattr(service, name, None)
+    if not callable(method):
+        raise RuntimeError(f"Approval 扩展运行时服务缺少方法: {name}")
+    return method
+
+def count_post_pending_approvals(*args, **kwargs):
+    return _service_method(get_runtime_service("content.posts"), "count_pending_approvals")(*args, **kwargs)
 
 
 def admin_stats_resource_field_definitions():
@@ -40,7 +49,7 @@ def admin_stats_resource_field_definitions():
 
 
 def resolve_admin_pending_approvals(stats, context: dict) -> int:
-    return count_runtime_discussion_pending_approvals() + count_runtime_post_pending_approvals()
+    return count_discussion_pending_approvals() + count_post_pending_approvals()
 
 
 def resolve_approval_event_data(post, context: dict) -> dict | None:
